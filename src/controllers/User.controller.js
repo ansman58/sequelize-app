@@ -46,6 +46,11 @@ class UserController {
           },
         ],
       });
+      if (!user) {
+        return res
+          .status(404)
+          .send({ status: "failed", message: "User not found" });
+      }
       return res.status(200).send({ status: "success", user });
     } catch (error) {
       UserController.errorHandler(error, res);
@@ -63,6 +68,11 @@ class UserController {
       }
 
       const user = await User.findByPk(req.params.id);
+      if (!user) {
+        return res
+          .status(404)
+          .send({ status: "failed", message: "User not found" });
+      }
 
       const updated_user = await user.update({ name, email, avatar });
       return res.status(200).send({
@@ -83,11 +93,15 @@ class UserController {
           .json({ status: "failed", error: "Please provide a valid id" });
       }
       const user = await User.findByPk(req.params.id);
-      const delteUser = await user.destroy();
+      if (!user) {
+        return res
+          .status(404)
+          .send({ status: "failed", message: "User not found" });
+      }
+      await user.destroy();
       return res.status(200).send({
         status: "success",
         message: "User deleted successfully",
-        delteUser,
       });
     } catch (error) {
       UserController.errorHandler(error, res);
