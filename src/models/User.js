@@ -26,7 +26,5 @@ User.init(
   { sequelize }
 );
 
-User.hasMany(Events);
-Events.belongsTo(User, { foreignKey: "creator_id" });
 
 module.exports = User;

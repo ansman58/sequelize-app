@@ -1,9 +1,9 @@
 const { DataTypes, Model } = require("sequelize");
 const sequelize = require("../config/config");
 
-class Image extends Model {}
+class Images extends Model {}
 
-Image.init(
+Images.init(
   {
     id: {
       type: DataTypes.UUID,
@@ -17,3 +17,5 @@ Image.init(
   },
   { sequelize }
 );
+
+module.exports = Images;
