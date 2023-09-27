@@ -1,5 +1,6 @@
-const sequelize = require("../config/database");
-const { DataTypes } = require("sequelize");
+const { DataTypes, Model } = require("sequelize");
+const sequelize = require("../config/config");
+const Events = require("./Events");
 
 class User extends Model {}
 
@@ -24,5 +25,8 @@ User.init(
   },
   { sequelize }
 );
+
+User.hasMany(Events);
+Events.belongsTo(User, { foreignKey: "creator_id" });
 
 module.exports = User;
