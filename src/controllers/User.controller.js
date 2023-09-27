@@ -7,14 +7,11 @@ class UserController {
       const { name, email, avatar } = req.body;
       const user = await User.create({ name, email, avatar });
 
-      const response = new ControllerResponse({
-        response: res,
-        message: "User created successfully",
-      });
+      const response = new ControllerResponse(res);
 
-      response.send(user, "created");
+      response.send(user, "User created successfully");
     } catch (error) {
-      UserController.errorHandler(error, res);
+      response.handleServerError(error);
     }
   }
 
@@ -25,14 +22,11 @@ class UserController {
         include: [{ model: Events }],
       });
 
-      const response = new ControllerResponse({
-        response: res,
-        message: "Users retrieved successfully",
-      });
+      const response = new ControllerResponse(res);
 
-      response.send({ users });
+      response.send(users, "Users retrieved successfully");
     } catch (error) {
-      UserController.errorHandler(error, res);
+      response.handleServerError(error);
     }
   }
 
@@ -57,7 +51,7 @@ class UserController {
 
       response.send(user);
     } catch (error) {
-      UserController.errorHandler(error, res);
+      response.handleServerError(error);
     }
   }
 
@@ -81,7 +75,7 @@ class UserController {
 
       response.send(updatedUser, "User updated successfully");
     } catch (error) {
-      UserController.errorHandler(error, res);
+      response.handleServerError(error);
     }
   }
 
@@ -107,13 +101,8 @@ class UserController {
 
       response.send();
     } catch (error) {
-      UserController.errorHandler(error, res);
+      response.handleServerError(error);
     }
-  }
-
-  static errorHandler(error, res) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
   }
 }
 

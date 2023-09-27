@@ -31,6 +31,11 @@ class ControllerResponse {
       message: message || "Bad request",
     });
   }
+
+  handleServerError(error) {
+    console.error(error);
+    this.response.status(500).json({ error: error.message });
+  }
 }
 
 module.exports = ControllerResponse;
