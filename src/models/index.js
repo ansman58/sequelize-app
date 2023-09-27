@@ -52,7 +52,14 @@ Events.belongsToMany(User, {
   foreignKey: "event_id",
 });
 
+User.belongsToMany(Comments, { through: "likes", foreignKey: "user_id" });
+Comments.belongsToMany(User, { through: "likes", foreignKey: "comment_id" });
 
+Groups.belongsToMany(Images, { through: "group_image", foreignKey: "user_id" });
+Images.belongsToMany(Groups, {
+  through: "group_image",
+  foreignKey: "image_id",
+});
 
 module.exports = {
   User,

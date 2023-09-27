@@ -18,6 +18,13 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: {
+          args: true,
+          msg: "Please enter a valid email address",
+        },
+      },
     },
     avatar: {
       type: DataTypes.STRING,
@@ -25,6 +32,5 @@ User.init(
   },
   { sequelize }
 );
-
 
 module.exports = User;
