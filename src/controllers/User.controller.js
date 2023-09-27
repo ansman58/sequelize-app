@@ -40,11 +40,10 @@ class UserController {
     try {
       const userId = req.params.id;
 
+      const response = new ControllerResponse(res);
+
       if (!userId) {
-        return ControllerResponse.handleBadRequest(
-          res,
-          "Please provide a valid id"
-        );
+        return response.handleBadRequest("Please provide a valid id");
       }
 
       const user = await User.findByPk(userId, {
@@ -52,71 +51,59 @@ class UserController {
         include: [{ model: Events }],
       });
 
-      const response = new ControllerResponse({
-        response: res,
-        message: "User retrieved successfully",
-      });
+      if (!user) {
+        return response.handleNotFound("User not found");
+      }
 
-      response.handleNotFound(user);
+      response.send(user);
     } catch (error) {
       UserController.errorHandler(error, res);
     }
   }
 
   static async update(req, res) {
+    const response = new ControllerResponse(res);
     try {
       const userId = req.params.id;
       const { name, email, avatar } = req.body;
 
       if (!userId) {
-        return ControllerResponse.handleBadRequest(
-          res,
-          "Please provide a valid id"
-        );
+        return response.handleBadRequest("Please provide a valid id");
       }
 
       const user = await User.findByPk(userId);
 
       if (!user) {
-        return ControllerResponse.handleNotFound(res, "User not found");
+        return response.handleNotFound("User not found");
       }
 
       const updatedUser = await user.update({ name, email, avatar });
 
-      const response = new ControllerResponse({
-        response: res,
-        message: "User updated successfully",
-      });
-
-      response.send({ updatedUser });
+      response.send(updatedUser, "User updated successfully");
     } catch (error) {
       UserController.errorHandler(error, res);
     }
   }
 
   static async destroy(req, res) {
+    const response = new ControllerResponse(res);
+
     try {
       const userId = req.params.id;
 
       if (!userId) {
-        return ControllerResponse.handleBadRequest(
-          res,
-          "Please provide a valid id"
-        );
+        return response.handleBadRequest("Please provide a valid id");
       }
 
       const user = await User.findByPk(userId);
 
       if (!user) {
-        return ControllerResponse.handleNotFound(res, "User not found");
+        return response.handleNotFound("User not found");
       }
 
       await user.destroy();
 
-      const response = new ControllerResponse({
-        response: res,
-        message: "User deleted successfully",
-      });
+      response.send(null, "User deleted successfully");
 
       response.send();
     } catch (error) {

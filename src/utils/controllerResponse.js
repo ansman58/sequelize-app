@@ -1,13 +1,12 @@
 class ControllerResponse {
-  constructor({ status, message, response }) {
-    this.message = message || null;
+  constructor(response) {
     this.response = response;
   }
 
-  send(data, status) {
-    return this.response.status(200).json({
-      status: status || "success",
-      message: this.message,
+  send(data, message, statusCode) {
+    return this.response.status(statusCode || 200).json({
+      status: "success",
+      message,
       data,
     });
   }
@@ -19,10 +18,17 @@ class ControllerResponse {
     });
   }
 
-  handleNotFound(item) {
+  handleNotFound(message) {
     return this.response.status(404).json({
       status: "failed",
-      message: this.message || "Not found",
+      message: message || "Not found",
+    });
+  }
+
+  handleBadRequest(message) {
+    return this.response.status(400).json({
+      status: "failed",
+      message: message || "Bad request",
     });
   }
 }
