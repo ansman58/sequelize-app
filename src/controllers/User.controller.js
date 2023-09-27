@@ -3,11 +3,11 @@ const ControllerResponse = require("../utils/controllerResponse");
 
 class UserController {
   static async store(req, res) {
+    const response = new ControllerResponse(res);
+
     try {
       const { name, email, avatar } = req.body;
       const user = await User.create({ name, email, avatar });
-
-      const response = new ControllerResponse(res);
 
       response.send(user, "User created successfully", 201);
     } catch (error) {
@@ -16,13 +16,13 @@ class UserController {
   }
 
   static async index(req, res) {
+    const response = new ControllerResponse(res);
+
     try {
       const users = await User.findAndCountAll({
         attributes: ["id", "name", "email", "avatar"],
         include: [{ model: Events }],
       });
-
-      const response = new ControllerResponse(res);
 
       response.send(users, "Users retrieved successfully");
     } catch (error) {
@@ -31,10 +31,10 @@ class UserController {
   }
 
   static async show(req, res) {
+    const response = new ControllerResponse(res);
+
     try {
       const userId = req.params.id;
-
-      const response = new ControllerResponse(res);
 
       if (!userId) {
         return response.handleBadRequest("Please provide a valid id");
