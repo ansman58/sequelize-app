@@ -1,15 +1,18 @@
 const { User, Events } = require("../models/index");
+const ControllerResponse = require("../utils/controllerResponse");
 
 class UserController {
   static async store(req, res) {
     try {
       const { name, email, avatar } = req.body;
       const user = await User.create({ name, email, avatar });
-      return res.status(200).json({
-        status: "success",
+
+      const response = new ControllerResponse({
+        response: res,
         message: "User created successfully",
-        user,
       });
+
+      response.send(user, "created");
     } catch (error) {
       UserController.errorHandler(error, res);
     }
@@ -19,13 +22,15 @@ class UserController {
     try {
       const users = await User.findAndCountAll({
         attributes: ["id", "name", "email", "avatar"],
-        include: [
-          {
-            model: Events,
-          },
-        ],
+        include: [{ model: Events }],
       });
-      res.status(200).send({ status: "success", users });
+
+      const response = new ControllerResponse({
+        response: res,
+        message: "Users retrieved successfully",
+      });
+
+      response.send({ users });
     } catch (error) {
       UserController.errorHandler(error, res);
     }
@@ -33,25 +38,26 @@ class UserController {
 
   static async show(req, res) {
     try {
-      if (!req.params.id) {
-        return res
-          .status(400)
-          .json({ status: "failed", error: "Please provide a valid id" });
+      const userId = req.params.id;
+
+      if (!userId) {
+        return ControllerResponse.handleBadRequest(
+          res,
+          "Please provide a valid id"
+        );
       }
-      const user = await User.findByPk(req.params.id, {
+
+      const user = await User.findByPk(userId, {
         attributes: ["id", "name", "email", "avatar"],
-        include: [
-          {
-            model: Events,
-          },
-        ],
+        include: [{ model: Events }],
       });
-      if (!user) {
-        return res
-          .status(404)
-          .send({ status: "failed", message: "User not found" });
-      }
-      return res.status(200).send({ status: "success", user });
+
+      const response = new ControllerResponse({
+        response: res,
+        message: "User retrieved successfully",
+      });
+
+      response.handleNotFound(user);
     } catch (error) {
       UserController.errorHandler(error, res);
     }
@@ -59,27 +65,30 @@ class UserController {
 
   static async update(req, res) {
     try {
+      const userId = req.params.id;
       const { name, email, avatar } = req.body;
 
-      if (!req.params.id) {
-        return res
-          .status(400)
-          .json({ status: "failed", error: "Please provide a valid id" });
+      if (!userId) {
+        return ControllerResponse.handleBadRequest(
+          res,
+          "Please provide a valid id"
+        );
       }
 
-      const user = await User.findByPk(req.params.id);
+      const user = await User.findByPk(userId);
+
       if (!user) {
-        return res
-          .status(404)
-          .send({ status: "failed", message: "User not found" });
+        return ControllerResponse.handleNotFound(res, "User not found");
       }
 
-      const updated_user = await user.update({ name, email, avatar });
-      return res.status(200).send({
-        status: "success",
+      const updatedUser = await user.update({ name, email, avatar });
+
+      const response = new ControllerResponse({
+        response: res,
         message: "User updated successfully",
-        updated_user,
       });
+
+      response.send({ updatedUser });
     } catch (error) {
       UserController.errorHandler(error, res);
     }
@@ -87,32 +96,37 @@ class UserController {
 
   static async destroy(req, res) {
     try {
-      if (!req.params.id) {
-        return res
-          .status(400)
-          .json({ status: "failed", error: "Please provide a valid id" });
+      const userId = req.params.id;
+
+      if (!userId) {
+        return ControllerResponse.handleBadRequest(
+          res,
+          "Please provide a valid id"
+        );
       }
-      const user = await User.findByPk(req.params.id);
+
+      const user = await User.findByPk(userId);
+
       if (!user) {
-        return res
-          .status(404)
-          .send({ status: "failed", message: "User not found" });
+        return ControllerResponse.handleNotFound(res, "User not found");
       }
+
       await user.destroy();
-      return res.status(200).send({
-        status: "success",
+
+      const response = new ControllerResponse({
+        response: res,
         message: "User deleted successfully",
       });
+
+      response.send();
     } catch (error) {
       UserController.errorHandler(error, res);
     }
   }
 
   static errorHandler(error, res) {
-    if (error) {
-      console.log(error);
-      res.status(500).json({ error: error.message });
-    }
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 }
 
