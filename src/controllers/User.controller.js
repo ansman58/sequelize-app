@@ -9,7 +9,7 @@ class UserController {
 
       const response = new ControllerResponse(res);
 
-      response.send(user, "User created successfully");
+      response.send(user, "User created successfully", 201);
     } catch (error) {
       response.handleServerError(error);
     }
@@ -49,7 +49,7 @@ class UserController {
         return response.handleNotFound("User not found");
       }
 
-      response.send(user);
+      response.send(user, "User retrieved successfully");
     } catch (error) {
       response.handleServerError(error);
     }
@@ -98,8 +98,6 @@ class UserController {
       await user.destroy();
 
       response.send(null, "User deleted successfully");
-
-      response.send();
     } catch (error) {
       response.handleServerError(error);
     }
